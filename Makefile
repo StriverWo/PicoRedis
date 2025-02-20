@@ -8,6 +8,7 @@ SRCDIR = src
 TESTDIR = testnew
 BUILDDIR = build
 BINDIR = bin
+DATA = data
 
 # 源代码文件
 SRC_FILES = $(wildcard $(SRCDIR)/**/*.cpp)  # 查找 src 目录下所有的.cpp 文件
@@ -20,6 +21,7 @@ TARGETS = $(BINDIR)/redisServer $(BINDIR)/redisClient  # 新增 redisClient 可�
 # 创建目录
 $(shell mkdir -p $(BUILDDIR))
 $(shell mkdir -p $(BINDIR))
+$(shell mkdir -p $(DATA))
 $(shell mkdir -p $(BUILDDIR)/Network)  # 确保 Network 子目录存在
 $(shell mkdir -p $(BUILDDIR)/Poller)  # 确保 Poller 子目录存在
 $(shell mkdir -p $(BUILDDIR)/Redis)  # 确保 Redis 子目录存在
@@ -51,7 +53,7 @@ $(BUILDDIR)/%.o: $(TESTDIR)/%.cpp
 # 清理构建文件
 clean:
 	find $(BUILDDIR) -name "*.o" -type f -exec rm -f {} +
-	rm -rf $(BINDIR)
+	rm -rf $(BINDIR) $(DATA) $(BUILDDIR)
 
 
 # 为 src 目录下的每个.cpp 文件添加头文件依赖
