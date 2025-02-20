@@ -1,6 +1,6 @@
 # PicoRedis
 一款C++11标准实现的高性能Redis服务器，且使用LevelDB进行数据持久化，LevelDB 是谷歌开源的键值数据库，以牺牲部分读性能的方式具备优秀的写性能。而 PicoRedis 只是将LevelDB 作为数据持久化的介质，和 Redis一样，读取和写入数据仍然始终是先写入内存。
-然后PicoRedis可以设置定期的触发持久化，事先数据的持久化。有关 LevelDB 源码的阅读笔记参见我的另一仓库：
+然后PicoRedis可以设置定期的触发持久化，事先数据的持久化。有关 LevelDB 源码的阅读笔记参见我的另一仓库：https://github.com/StriverWo/LevelDB-NOTE 。
 
 其有关网络部分的具体实现借鉴使用了开源项目ZLToolKit: https://github.com/ZLMediaKit/ZLToolKit/tree/master ，有关其源码笔记参考我的另一仓库：https://github.com/StriverWo/ZLToolKit-NOTE 。  
 PicoRedis 可以完美的与 Redis 自带的客户端Redis-cli实现交互，且可以使用Redis-benchmark进行性能测试。
