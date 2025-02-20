@@ -21,7 +21,6 @@ PicoRedis 可以完美的与 Redis 自带的客户端Redis-cli实现交互，且
 ## 编译
 ```Bash
 cd PicoRedis
-make clean
 make
 ```
 ## 运行
@@ -47,7 +46,7 @@ Starting PicoRedis server...
 
 
 ## 客户端连接
-这里客户端的代码还不太完善，所以目前可以直接使用 redis-cli 与之交互（需要事先安装Redis)，默认 PicoRedis 服务器端口是：6380。
+这里客户端的代码还不太完善，所以目前可以直接使用 redis-cli 与之交互（需要事先安装Redis)，默认 PicoRedis 服务器端口是：6380。打开另一终端输入：
 ```Bash
 redis-cli -p 6380
 ```
@@ -91,6 +90,7 @@ redis-benchmark -p 6380 -t set,get,hset,hget -c 100 -n 10000
 55248.62 requests per second
 ```
 可以与标准的 Redis 对比测试性能，但受限于个人水平，和Redis本身版本更迭性能卓越，PicoRedis难以达到Redis本身的高性能。  
+但是通过 redis-benchmark 测试可知 PicoRedis 仍然是一个高性能的设计
 
 ## 目前支持的命令
 
