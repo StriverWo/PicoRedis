@@ -2,20 +2,29 @@
 一款C++11标准实现的高性能Redis服务器，且使用LevelDB进行数据持久化，LevelDB 是谷歌开源的键值数据库，以牺牲部分读性能的方式具备优秀的写性能。而 PicoRedis 只是将LevelDB 作为数据持久化的介质，和 Redis一样，读取和写入数据仍然始终是先写入内存。
 然后PicoRedis可以设置定期的触发持久化，事先数据的持久化。有关 LevelDB 源码的阅读笔记参见我的另一仓库：https://github.com/StriverWo/LevelDB-NOTE 。
 
-其有关网络部分的具体实现借鉴使用了开源项目ZLToolKit: https://github.com/ZLMediaKit/ZLToolKit/tree/master ，有关其源码笔记参考我的另一仓库：https://github.com/StriverWo/ZLToolKit-NOTE 。  
+其有关网络部分的具体实现借鉴了开源项目ZLToolKit: https://github.com/ZLMediaKit/ZLToolKit/tree/master ，有关其源码笔记参考我的另一仓库：https://github.com/StriverWo/ZLToolKit-NOTE 。  
 PicoRedis 可以完美的与 Redis 自带的客户端Redis-cli实现交互，且可以使用Redis-benchmark进行性能测试。
 
 **附注**：本项目仅仅是个人学习项目，难免错误很多，还在不断的完善补充。
 
 ## 设计动机
 主要是在学习 Redis 之后有的这个想法：  
-* 传统 Redis 是基于 C 语言设计，而如今 C++ 有许多优秀的特性，比如说智能指针，STL标准库，多态，模板编程等，结合 C++ 的优势能否使得操作更加高效？
+* 传统 Redis 是基于 C 语言设计，而如今 C++ 有许多优秀的特性，比如说智能指针，STL标准库，多态，模板等，结合 C++ 的优势能否使得操作更加高效？
 * 传统 Redis 使用 AOF 或 RDB 方式进行持久化，但是他们始终是存储到文件中，文件内容最终落盘后才能实现永久的持久化。而 LevelDB 只需追加写日志的形式就能保证数据安全，追加写具有很高的性能。
 * 虽然 在Redis 中使用了多线程，但在较老版本的Redis中只是对比如说数据刷盘/数据删除等操作利用后台线程来异步完成操作。较新的版本 Redis6/7 中
 进一步采用多个IO线程来处理网络IO，因为 Redis 的主要瓶颈在于内存大小和网络IO速度。但是读写操作命令仍然使用单线程来处理。
 也就是说主线程只负责接受建立连接请求，并为其分配网络IO线程，通过全局等待队列和状态标志来进行网络IO线程和主线程的通信。当网络IO线程读取请求并解析完毕后，
 再通知主线程进行执行命令。如果需要回写socket，那么主线程再将该任务交给网络IO线程来处理。
 **但是，Redis6/7都是由单个线程完成socket的连接请求建立的，PicoRedis 的设计借鉴了 ZLToolKit 的设计，采用多线程监听，抢占式accept连接方式进行设计。**
+
+## 主要模块
+### 网络部分：
+**多线程监听+抢占式accept**  
+在PicoRedis服务器启动的时候，会创建一个socket，经过命名绑定(bind)，然后调用listen系统调用创建一个监听队列以存放待处理的客户连接。然后将这个监听socket fd下发给多个线程进行监听，当socket可读时会触发accept事件回调，由于accept系统调用本身是线程安全的，多线程accept并不会出现竞态条件，因为内核会保证同一时刻只有一个线程能够成功接受连接。
+**多线程多epoll，一个线程一个事件轮询（one pthead one loop)**  
+### 命令解析部分：
+全局维护一个命令解析工厂（享元工厂模式），用unordered_map来维护<命令,命令解析器>的映射。用智能指针加以管理每个命令解析器。保证全局只存在相应命令对应的一个命令解析器。
+
 
 
 ## 编译
